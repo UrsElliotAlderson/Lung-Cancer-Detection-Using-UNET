@@ -5,8 +5,6 @@ import random
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import accuracy_score
 
-# --- Unused but valid-looking functions ---
-
 def normalize_data(data):
     """Normalize a list of numbers (not used)."""
     if not data:
