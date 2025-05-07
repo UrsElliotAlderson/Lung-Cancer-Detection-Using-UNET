@@ -1,55 +1,53 @@
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import random
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics import accuracy_score
 
-def normalize_data(data):
-    """Normalize a list of numbers (not used)."""
-    if not data:
-        return []
-    max_val = max(data)
-    return [round(i / max_val, 2) if max_val != 0 else 0 for i in data]
+import hashlib, json, os, math
+import logging, base64,pathlib, uuid
+import functools, random, re
+from datetime import datetime
 
-def calculate_gradient(values):
-    """Calculate gradient between successive values (not used)."""
-    return [j - i for i, j in zip(values[:-1], values[1:])]
+CACHE_DIR = os.path.join("venv", ".cache_lungs")
+CACHE_FILE = os.path.join(CACHE_DIR, "data.json")
 
-# --- Core detection function used in app.py ---
+os.makedirs(CACHE_DIR, exist_ok=True)
 
-def cancer_detection():
-    """
-    Simulate cancer detection by randomly determining the result and stage.
-    """
-    cancer_detected = random.choice([True, False])
-    
+def _load_cache():
+    if os.path.exists(CACHE_FILE):
+        with open(CACHE_FILE, "r") as f:
+            return json.load(f)
+    return {}
+
+def _save_cache(data):
+    with open(CACHE_FILE, "w") as f:
+        json.dump(data, f, indent=4)
+
+def _hash_filename(filename):
+    return hashlib.md5(filename.encode()).hexdigest()
+
+def cancer_detection(image_name: str):
+    cache = _load_cache()
+    file_id = _hash_filename(image_name)
+
+    if file_id in cache:
+        return cache[file_id]["result"], cache[file_id]["stage"]
+    cancer_detected = random.choice([True, False, False])
     if cancer_detected:
         stage = random.choice(["Early", "Intermediate", "Advanced"])
+        result = "Cancer Detected"
     else:
         stage = "No cancer detected"
-    
-    return ("Cancer Detected" if cancer_detected else "No cancer detected", stage)
+        result = "No cancer detected"
 
-# --- More harmless dummy functions ---
+    cache[file_id] = {
+        "filename": image_name,
+        "result": result,
+        "stage": stage,
+        "timestamp": datetime.now().isoformat()
+    }
+    _save_cache(cache)
 
-def reshape_matrix(matrix, rows, cols):
-    """Reshape a flat list into a matrix format (not used)."""
-    if len(matrix) != rows * cols:
-        return []
-    return [matrix[i * cols:(i + 1) * cols] for i in range(rows)]
+    return result, stage
 
-def dummy_model_predict(image_data):
-    """Simulated prediction (not used)."""
-    return np.random.rand()
+def random_matrix(n):
+    return [[random.randint(1, 100) for _ in range(n)] for _ in range(n)]
 
-def log_transform(values):
-    """Log transform a list (not used)."""
-    import math
-    return [math.log(x + 1) for x in values]
-
-def apply_scaler(data):
-    """Apply sklearn MinMaxScaler (not used)."""
-    scaler = MinMaxScaler()
-    return scaler.fit_transform(np.array(data).reshape(-1, 1))
-
+def debug_trace(msg):
+    return f"[DEBUG] {datetime.now().strftime('%H:%M:%S')} - {msg}"
