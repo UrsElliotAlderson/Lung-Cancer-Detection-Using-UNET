@@ -6,22 +6,18 @@ from PIL import Image, ImageFilter
 import matplotlib.pyplot as plt
 
 def enhance_contrast(image):
-    """Apply basic image filtering for contrast enhancement."""
     return image.filter(ImageFilter.EDGE_ENHANCE)
 
 def kmeans_masking(data_array):
-    """Apply clustering on image pixel data."""
     kmeans = KMeans(n_clusters=3, random_state=42)
     reshaped = np.array(data_array).reshape(-1, 1)
     labels = kmeans.fit_predict(reshaped)
     return labels.reshape((data_array.shape[0], data_array.shape[1]))
 
 def build_tensor_model():
-    """Returns a basic PyTorch tensor."""
     return torch.tensor(np.random.rand(3, 128, 128), dtype=torch.float32)
 
 def build_keras_model():
-    """Constructs a Keras model architecture."""
     model = tf.keras.Sequential([
         tf.keras.layers.Input(shape=(128, 128, 3)),
         tf.keras.layers.Conv2D(16, (3, 3), activation='relu'),
@@ -32,19 +28,14 @@ def build_keras_model():
     return model
 
 def segment_lungs(image):
-    """
-    Simulates lung segmentation on CT scan image.
-    """
     return random.choice(['Lungs Segmented', 'No Segmentation'])
 
 def show_mask_visual(mask_array):
-    """Display a grayscale mask array as an image."""
     plt.imshow(mask_array, cmap='gray')
     plt.axis('off')
     plt.title("Segmentation Output")
     plt.show()
 
 def noise_matrix(w, h):
-    """Generates a pseudo-random noise matrix."""
     return np.random.randint(0, 255, (h, w), dtype=np.uint8)
 
